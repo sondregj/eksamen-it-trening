@@ -28,10 +28,6 @@ function Anim() {
   }
 }
 
-function replay() {
-  anim.reset();
-}
-
 function setup() {
   ready = false;
   loadcount = 0;
@@ -49,7 +45,7 @@ function setup() {
 
   button = createButton('Replay');
   button.parent('animation');
-  button.mouseClicked(replay);
+  button.mouseClicked(anim.reset());
 
   textAlign(CENTER, CENTER);
   textSize(10);
