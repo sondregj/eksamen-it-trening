@@ -1,8 +1,8 @@
 // Sondre Gjellestad | 2017
 
 function setup() {
-  futura_pt_medium = loadFont('/fonts/futura-pt-medium.ttf', checkload);
-  futura_pt_book = loadFont('/fonts/futura-pt-book.ttf', checkload);
+  futura_pt_medium = loadFont('fonts/futura-pt-medium.ttf', checkload);
+  futura_pt_book = loadFont('fonts/futura-pt-book.ttf', checkload);
   loadcount = 0;
 
   noCanvas();
