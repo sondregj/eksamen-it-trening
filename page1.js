@@ -39,6 +39,8 @@ function setup() {
   var canvas = createCanvas(600, 200, P2D);
   canvas.parent('animation');
   frameRate(60);
+  
+  anim = new Anim();
 
   noStroke();
   fill(200);
@@ -55,7 +57,6 @@ function checkload() {
   loadcount++;
   if (loadcount == 3) { // Things to do when everything is loaded.
     ready = true;
-    anim = new Anim();
   }
 }
 
