@@ -3,7 +3,7 @@
 ## Programvare
 Utviklingsoppgaven er løst ved hjelp av webteknologiene HTML, Javascript og CSS, som kjøres i en nettleser. For å løse oppgaven er det i tillegg tatt i bruk et bibliotek for Javascript, som heter p5.js. Det er integrert i besvarelsesfilene.
 
-Det kreves en moderne nettleser som kan kjøre HTML5.
+Det kreves en moderne nettleser som kan kjøre HTML5 og en HTTP-server å servere filene fra.
 
 ## Oppgave 1 | Animasjon
 
