@@ -36,9 +36,9 @@ function setup() {
   ready = false;
   loadcount = 0;
 
-  car = loadImage('eksamen-it-trening/img/car.png', checkload);
-  sign = loadImage('eksamen-it-trening/img/sign.png', checkload);
-  carSound = loadSound('eksamen-it-trening/sound/car-sound.mp3', checkload);
+  car = loadImage('img/car.png', checkload);
+  sign = loadImage('img/sign.png', checkload);
+  carSound = loadSound('sound/car-sound.mp3', checkload);
 
   var canvas = createCanvas(600, 200, P2D);
   canvas.parent('animation');
