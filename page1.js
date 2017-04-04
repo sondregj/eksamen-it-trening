@@ -28,6 +28,10 @@ function Anim() {
   }
 }
 
+function replay() {
+  anim.reset();
+}
+
 function setup() {
   ready = false;
   loadcount = 0;
@@ -40,14 +44,14 @@ function setup() {
   canvas.parent('animation');
   frameRate(60);
   
-  anim = new Anim();
+  
 
   noStroke();
   fill(200);
 
   button = createButton('Replay');
   button.parent('animation');
-  button.mouseClicked(anim.reset());
+  button.mouseClicked(replay);
 
   textAlign(CENTER, CENTER);
   textSize(10);
@@ -57,6 +61,7 @@ function checkload() {
   loadcount++;
   if (loadcount == 3) { // Things to do when everything is loaded.
     ready = true;
+    anim = new Anim();
   }
 }
 
