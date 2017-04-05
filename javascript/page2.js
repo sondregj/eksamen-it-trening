@@ -1,4 +1,4 @@
-// Sondre Gjellestad | 2017
+﻿// Sondre Gjellestad | 2017
 
 var speedInit = 1;
 var printPenalty = 0;
@@ -84,7 +84,7 @@ function UI() {
     maxVel.id('maxVel');
     maxVelOut = createSpan('');
     maxVelOut.parent('maxVel');
-    vehicleMaxVel = createSlider(10, 200, 90, 5);
+    vehicleMaxVel = createSlider(5, 200, 90, 5);
     vehicleMaxVel.parent('addData');
     vehicleMaxVel.input(ui.update);
     vehicleMaxVel.attribute("placeholder", "Tillatt toppfart");
