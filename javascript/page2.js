@@ -170,13 +170,18 @@ function UI() {
     } else if (result == 0) {
       lookupResult.html('Ingen treff.');
     } else {
+	    vehicleType.value(result.type);
       var mS = result.maxSpeed;
+	    
       if (mS == 0) {
+	      vehicleMaxVel.value(200);
         mS = "ubegrenset";
       } else {
+	      vehicleMaxVel.value(mS);
         mS = mS + "km/t";
       }
       lookupResult.html("Kjøretøy: " + result.type + " | Tillatt toppfart: " + mS);
+	    
     }
     
     if (!result.maxSpeed == 0) {
