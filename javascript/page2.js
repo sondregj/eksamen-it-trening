@@ -260,9 +260,9 @@ function Database() {
   this.addFromForm = function() {
     var a = carId.value();
     if (a !== "") {
-      if (a == 200) {a = 0;}
       var b = vehicleType.value();
       var c = vehicleMaxVel.value();
+      if (c == 200) {c = 0;}
       database.addEntry(a, b, c);
     }
     ui.update();
