@@ -87,7 +87,6 @@ function UI() {
     vehicleMaxVel = createSlider(10, 200, 90, 5);
     vehicleMaxVel.parent('addData');
     vehicleMaxVel.input(ui.update);
-    //vehicleMaxVel.attribute("maxlength", "10");
     vehicleMaxVel.attribute("placeholder", "Tillatt toppfart");
 
 
@@ -179,8 +178,13 @@ function UI() {
     } else {
       vehiclePenalty.html('');
     }
-
-    maxVelOut.html(vehicleMaxVel.value() + "km/t");
+    
+    var mVOut = vehicleMaxVel.value();
+    if (mVOut == 200) {
+      maxVelOut.html("Ubegrenset");
+    } else {
+      maxVelOut.html(mVOut + "km/t");
+    }
   }
 }
 
@@ -246,6 +250,7 @@ function Database() {
   this.addFromForm = function() {
     var a = carId.value();
     if (a !== "") {
+      if (a == 200) {a = 999;}
       var b = vehicleType.value();
       var c = vehicleMaxVel.value();
       database.addEntry(a, b, c);
