@@ -265,10 +265,7 @@ function Database() {
   this.addFromForm = function() {
     var a = carId.value();
     var x = database.lookup(a);
-    console.log(x);
-	  
-    var found = 1; 
-    if (a !== "" && found) {
+	  if (!x && a !== "") {
       var b = vehicleType.value();
       var c = vehicleMaxVel.value();
       if (c == 200) {c = 0;}
