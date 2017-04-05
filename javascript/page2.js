@@ -1,6 +1,7 @@
 // Sondre Gjellestad | 2017
 
 var speedInit = 1;
+var printPenalty = 0;
 
 function setup() {
   loadFiles(1);
@@ -28,7 +29,7 @@ function setupHTML() {
 
   timeOut = createP('');
   timeOut.parent('time');
-  timerToggle = createButton('Start/stopp timer');
+  timerToggle = createButton('Start | stopp');
   timerToggle.parent('time');
   timerToggle.mousePressed(timer.toggle);
 
@@ -154,8 +155,14 @@ function updateHTML() {
   }
 
   var penaltyKr = penaltyCheck();
-  if (penaltyKr >= 0) {
+  console.log(penaltyKr);
+  if (penaltyKr == 0) {
+    printPenalty = 0;
+  } else if (penaltyKr > 0) {
     penaltyKr += "kr";
+    printPenalty = 1;
+  } else {
+    printPenalty = 1;
   }
   var date = day() + "." + month() + "." + year();
   var timenow = hour() + "." + minute();
@@ -164,7 +171,11 @@ function updateHTML() {
   } else {
     regnr = carId.value();
   }
-  penalty.html(date + " | " + timenow + " | " + regnr + " | " + penaltySpeed + " | " + penaltyKr);
+  if (printPenalty) {
+    penalty.html(date + " | " + timenow + " | " + regnr + " | " + penaltySpeed + " | " + penaltyKr);
+  } else {
+    penalty.html('Ingen bot.')
+  }
 
   var result = database.lookup(regnr);
   if (result == 0) {
