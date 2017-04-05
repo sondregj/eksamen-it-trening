@@ -23,7 +23,7 @@ function setup() {
 
 function setupHTML() {
   button = createButton('Replay');
-  button.parent('animation');
+  button.parent('replay');
   button.mouseClicked(replay);
 }
 

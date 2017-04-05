@@ -56,15 +56,44 @@ function UI() {
 
     // Loggføring
     carId = createInput('', text);
-    carId.parent('inputfields');
+    carId.parent('regcheck');
     carId.input(ui.update);
+    carId.attribute("maxlength", "7");
+    carId.attribute("placeholder", "Registreringsnummer");
 
-
-    lookupResult = createSpan('');
+    lookupResult = createP('');
     lookupResult.parent('lookup');
 
     vehiclePenalty = createP('');
     vehiclePenalty.parent('lookup');
+
+    // Legge til kjøretøy i database
+    vehicleType = createSelect(0);
+    vehicleType.option('Type ');
+    vehicleType.option('Personbil');
+    vehicleType.option('Buss');
+    vehicleType.option('Lastebil');
+    vehicleType.option('Moped');
+    vehicleType.option('Motorsykkel');
+    vehicleType.changed(ui.update);
+    vehicleType.parent('addData');
+    vehicleType.input(ui.update);
+
+    maxVel = createP('<b>Tillatt toppfart | </b>');
+    maxVel.parent('addData');
+    maxVel.id('maxVel');
+    maxVelOut = createSpan('');
+    maxVelOut.parent('maxVel');
+    vehicleMaxVel = createSlider(10, 200, 90, 5);
+    vehicleMaxVel.parent('addData');
+    vehicleMaxVel.input(ui.update);
+    //vehicleMaxVel.attribute("maxlength", "10");
+    vehicleMaxVel.attribute("placeholder", "Tillatt toppfart");
+
+
+    addButton = createButton('Legg til i register');
+    addButton.parent('addData');
+    addButton.mousePressed(database.addFromForm);
   }
 
 
@@ -137,10 +166,12 @@ function UI() {
     }
 
     var result = database.lookup(regnr);
-    if (result == 0) {
+    if (carId.value().length == 0) {
+      lookupResult.html('Skriv inn registreringsnummer.');
+    } else if (result == 0) {
       lookupResult.html('Ingen treff.');
     } else {
-      lookupResult.html(result.id + " | " + result.type + " | Toppfart: " + result.maxSpeed + "km/t");
+      lookupResult.html("Kjøretøy: " + result.type + " | Tillatt toppfart: " + result.maxSpeed + "km/t");
     }
 
     if (speed > result.maxSpeed) {
@@ -148,6 +179,8 @@ function UI() {
     } else {
       vehiclePenalty.html('');
     }
+
+    maxVelOut.html(vehicleMaxVel.value() + "km/t");
   }
 }
 
@@ -210,6 +243,16 @@ function Database() {
     this.addEntry('ST33445', 'Personbil', 999);
   }
 
+  this.addFromForm = function() {
+    var a = carId.value();
+    if (a !== "") {
+      var b = vehicleType.value();
+      var c = vehicleMaxVel.value();
+      database.addEntry(a, b, c);
+    }
+    ui.update();
+  }
+
   this.addEntry = function(id_, type_, maxSpeed_) {
     this.storage.push({
       id: id_,
@@ -230,17 +273,6 @@ function Database() {
       return 0;
     }
   }
-}
-
-function afterDecimal(n) {
-  var d = n.toString().split(".")[1];
-  if (d) {
-    return d.length;
-  }
-}
-
-function beforeDecimal(n) {
-  return n.toString().split(".")[0].length;
 }
 
 function penaltyCheck() {
@@ -286,6 +318,17 @@ function penaltyCheck() {
     speedPenalty = 0;
   }
   return speedPenalty;
+}
+
+function afterDecimal(n) {
+  var d = n.toString().split(".")[1];
+  if (d) {
+    return d.length;
+  }
+}
+
+function beforeDecimal(n) {
+  return n.toString().split(".")[0].length;
 }
 
 function draw() {

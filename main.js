@@ -19,8 +19,5 @@ function loadFiles(pageId_) {
     car = loadImage('img/car.png', checkload);
     sign = loadImage('img/sign.png', checkload);
     carSound = loadSound('sound/car-sound.mp3', checkload);
-  } else if (pageId == 1) {
-    //futura_pt_medium = loadFont('fonts/futura-pt-medium.ttf', checkload);
-    //futura_pt_book = loadFont('fonts/futura-pt-book.ttf', checkload);
   }
 }
