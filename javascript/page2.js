@@ -1,79 +1,83 @@
 // Sondre Gjellestad | 2017
 
-function setup() {
-  futura_pt_medium = loadFont('fonts/futura-pt-medium.ttf', checkload);
-  futura_pt_book = loadFont('fonts/futura-pt-book.ttf', checkload);
-  loadcount = 0;
+var speedInit = 1;
 
+function setup() {
+  loadFiles(1);
+
+  // Bruker ikke canvas
   noCanvas();
 
-  // Initialisere timerfunksjon og database
+  // Initialisere timer og database
   timer = new Timer();
   database = new Database();
 
-  database.init();
+  timer.init();
+  database.init(); // initialiserer databasen med eksempler
+
 
   // Sette opp HTML-elementer for brukerinteraksjon
-  distOut = createP('');
-  distOut.parent('distance');
+  setupHTML();
+  updateHTML();
+}
 
-  distanceInput = createSlider(0, 5000, 250, 25)
-  distanceInput.parent('distance');
-  distanceInput.input(updateHTML);
-
-  limitOut = createP('');
-  limitOut.parent('speedlimit');
-
-  speedLimit = createSlider(10, 130, 50, 10);
-  speedLimit.parent('speedlimit');
-  speedLimit.input(updateHTML);
-
-  timerToggle = createButton('Start/stopp timer');
-  timerToggle.parent('buttons');
-  timerToggle.mousePressed(timer.toggle);
-
-  timeOut = createP('');
-  timeOut.parent('time');
-
+function setupHTML() {
+  // Fart og timer
   speedOut = createP('');
   speedOut.parent('speed');
 
-  // Loggføring
-  penalty = createP('<b>Bot:</b> Ingen bot.');
+  timeOut = createP('');
+  timeOut.parent('time');
+  timerToggle = createButton('Start/stopp timer');
+  timerToggle.parent('time');
+  timerToggle.mousePressed(timer.toggle);
+
+  // Valg av distanse
+  distanceInput = createSlider(0, 5000, 250, 25)
+  distanceInput.parent('distance');
+  distanceInput.input(updateHTML);
+  distOut = createSpan('');
+  distOut.parent('distance');
+
+  // Valg av fartsgrense
+  speedLimit = createSlider(10, 130, 50, 10);
+  speedLimit.parent('speedlimit');
+  speedLimit.input(updateHTML);
+  limitOut = createSpan('');
+  limitOut.parent('speedlimit');
+
+  // Fartsbot
+  penalty = createSpan('<b>Bot:</b> Ingen bot.');
   penalty.parent('penalty')
+
+  // Loggføring
+
 
   carId = createInput('', text);
   carId.parent('inputfields');
   carId.input(updateHTML);
 
 
-  lookupResult = createP('');
+  lookupResult = createSpan('');
   lookupResult.parent('lookup');
 
   vehiclePenalty = createP('');
   vehiclePenalty.parent('lookup');
 }
 
-
-// Denne funksjonen holder styr på antall elementer som er lastet inn.
-// Grunnen til at jeg har en egen funksjon for dette er at det muliggjør
-// innlasting mens andre deler av skriptet kjører.
-function checkload() {
-  loadcount++;
-  if (loadcount == 2) {
-    ready = true;
-    updateHTML();
-  }
-}
-
 function Timer() {
   // Variabel som holder antall millisekunder tidtakeren har gått
   this.milliseconds = 0;
   this.running = 0;
+  this.hasRun = 0;
 
   this.startmillis = 0;
   this.currentmillis = 0;
   this.time = 0;
+
+  this.init = function() {
+    this.time = "0 minutter 0 sekunder 0 millisekunder";
+  }
 
   this.toggle = function() {
     if (timer.running) {
@@ -144,6 +148,11 @@ function updateHTML() {
     var penaltySpeed = speed + "km/t";
   }
 
+  if (timer.hasRun == 0) {
+    speedOut.html("--km/t");
+    timer.hasRun = 1;
+  }
+
   var penaltyKr = penaltyCheck();
   if (penaltyKr >= 0) {
     penaltyKr += "kr";
@@ -155,7 +164,7 @@ function updateHTML() {
   } else {
     regnr = carId.value();
   }
-  penalty.html(date + ", " + timenow + ", " + regnr + ", " + penaltySpeed + ", " + penaltyKr);
+  penalty.html(date + " | " + timenow + " | " + regnr + " | " + penaltySpeed + " | " + penaltyKr);
 
   var result = database.lookup(regnr);
   if (result == 0) {
