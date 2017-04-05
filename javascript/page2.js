@@ -12,58 +12,143 @@ function setup() {
   // Initialisere timer og database
   timer = new Timer();
   database = new Database();
+  ui = new UI();
+
 
   timer.init();
   database.init(); // initialiserer databasen med eksempler
-
+  ui.init();
 
   // Sette opp HTML-elementer for brukerinteraksjon
-  setupHTML();
-  updateHTML();
+  ui.update();
 }
 
-function setupHTML() {
-  // Fart og timer
-  speedOut = createP('');
-  speedOut.parent('speed');
 
-  timeOut = createP('');
-  timeOut.parent('time');
-  timerToggle = createButton('Start | stopp');
-  timerToggle.parent('time');
-  timerToggle.mousePressed(timer.toggle);
+function UI() {
+  this.init = function() {
+    // Fart og timer
+    speedOut = createP('');
+    speedOut.parent('speed');
 
-  // Valg av distanse
-  distanceInput = createSlider(0, 5000, 250, 25)
-  distanceInput.parent('distance');
-  distanceInput.input(updateHTML);
-  distOut = createSpan('');
-  distOut.parent('distance');
+    timeOut = createP('');
+    timeOut.parent('time');
+    timerToggle = createButton('Start | stopp');
+    timerToggle.parent('time');
+    timerToggle.mousePressed(timer.toggle);
 
-  // Valg av fartsgrense
-  speedLimit = createSlider(10, 130, 50, 10);
-  speedLimit.parent('speedlimit');
-  speedLimit.input(updateHTML);
-  limitOut = createSpan('');
-  limitOut.parent('speedlimit');
+    // Valg av distanse
+    distanceInput = createSlider(0, 5000, 250, 25)
+    distanceInput.parent('distance');
+    distanceInput.input(ui.update);
+    distOut = createSpan('');
+    distOut.parent('distance');
 
-  // Fartsbot
-  penalty = createSpan('<b>Bot:</b> Ingen bot.');
-  penalty.parent('penalty')
+    // Valg av fartsgrense
+    speedLimit = createSlider(10, 130, 50, 10);
+    speedLimit.parent('speedlimit');
+    speedLimit.input(ui.update);
+    limitOut = createSpan('');
+    limitOut.parent('speedlimit');
 
-  // Loggføring
+    // Fartsbot
+    penalty = createSpan('Ingen bot.');
+    penalty.parent('penalty')
+
+    // Loggføring
+    carId = createInput('', text);
+    carId.parent('inputfields');
+    carId.input(ui.update);
 
 
-  carId = createInput('', text);
-  carId.parent('inputfields');
-  carId.input(updateHTML);
+    lookupResult = createSpan('');
+    lookupResult.parent('lookup');
+
+    vehiclePenalty = createP('');
+    vehiclePenalty.parent('lookup');
+  }
 
 
-  lookupResult = createSpan('');
-  lookupResult.parent('lookup');
+  this.update = function() {
+    // Oppdater uttekstfelt
+    distOut.html(distanceInput.value() + " meter");
+    limitOut.html(speedLimit.value() + "km/t");
+    timeOut.html(timer.time);
 
-  vehiclePenalty = createP('');
-  vehiclePenalty.parent('lookup');
+    speed = floor((distanceInput.value() / (timer.currentmillis / 1000)) * 360) / 100;
+
+    var speedString = speed.toString();
+
+    var decimals = afterDecimal(speed);
+    if (decimals == 0) {
+      speedString += ".00";
+    } else if (decimals == 1) {
+      speedString = speedString + "0";
+
+    }
+
+    var digits = beforeDecimal(speed);
+    if (digits == 2) {
+      speedString = "0" + speedString;
+    } else if (digits == 1) {
+      speedString = "00" + speedString;
+    } else if (digits == 0) {
+      speedString = "000" + speedString;
+    }
+
+
+
+    if (speed > 1000) {
+      speedOut.html("> 1000km/t");
+      var penaltySpeed = "> 1000km/t";
+    } else {
+      speedOut.html(speedString + "km/t");
+      var penaltySpeed = speed + "km/t";
+    }
+
+    if (timer.hasRun == 0) {
+      speedOut.html("000.00km/t");
+      timer.hasRun = 1;
+    }
+
+    var penaltyKr = penaltyCheck();
+    if (penaltyKr == 0) {
+      printPenalty = 0;
+    } else if (penaltyKr > 0) {
+      penaltyKr += "kr";
+      printPenalty = 1;
+    } else {
+      printPenalty = 1;
+    }
+    var date = day() + "." + month() + "." + year();
+    var minutePrint = minute();
+    if (minutePrint < 10) {
+      minutePrint = "0" + minutePrint;
+    }
+    var timenow = hour() + "." + minutePrint;
+    if (carId.value() == 0) {
+      regnr = "Mangler registreringsnummer";
+    } else {
+      regnr = carId.value();
+    }
+    if (printPenalty) {
+      penalty.html(date + " | " + timenow + " | " + regnr + " | " + penaltySpeed + " | " + penaltyKr);
+    } else {
+      penalty.html('Ingen bot.')
+    }
+
+    var result = database.lookup(regnr);
+    if (result == 0) {
+      lookupResult.html('Ingen treff.');
+    } else {
+      lookupResult.html(result.id + " | " + result.type + " | Toppfart: " + result.maxSpeed + "km/t");
+    }
+
+    if (speed > result.maxSpeed) {
+      vehiclePenalty.html("Bot: " + date + ", " + timenow + ", " + regnr + ", Kjøretøyets toppfart: " + result.maxSpeed + "km/t, " + result.type + ", " + penaltySpeed + ", " + "10000kr");
+    } else {
+      vehiclePenalty.html('');
+    }
+  }
 }
 
 function Timer() {
@@ -77,7 +162,7 @@ function Timer() {
   this.time = 0;
 
   this.init = function() {
-    this.time = "0 minutter 0 sekunder 0 millisekunder";
+    this.time = "00 min | 00 sek | 000 ms";
   }
 
   this.toggle = function() {
@@ -91,10 +176,26 @@ function Timer() {
 
   this.update = function() {
     this.currentmillis = millis() - this.startmillis;
-    var secs = floor(this.currentmillis / 1000);
+
     var mins = floor(this.currentmillis / 60000);
-    this.time = mins + " minutter" + " " + secs + " sekunder" + " " + floor(this.currentmillis % 1000) + " millisekunder";
-    updateHTML();
+    if (mins < 10) {
+      mins = "0" + mins;
+    }
+
+    var secs = floor(this.currentmillis / 1000);
+    if (secs < 10) {
+      secs = "0" + secs;
+    }
+
+    var ms = floor(this.currentmillis % 1000);
+    if (ms < 10) {
+      ms = "00" + ms;
+    } else if (ms < 100) {
+      ms = "0" + ms;
+    }
+
+    this.time = mins + " min" + " | " + secs + " sek | " + ms + " ms";
+    ui.update();
   }
 }
 
@@ -121,8 +222,6 @@ function Database() {
     for (var i = 0; i < this.storage.length; i++) {
       if (id == this.storage[i].id) {
         var result = this.storage[i];
-      } else {
-
       }
     }
     if (result) {
@@ -133,63 +232,15 @@ function Database() {
   }
 }
 
-
-function updateHTML() {
-  // Oppdater uttekstfelt
-  distOut.html(distanceInput.value() + " meter");
-  limitOut.html(speedLimit.value() + "km/t");
-  timeOut.html(timer.time);
-
-  speed = floor((distanceInput.value() / (timer.currentmillis / 1000)) * 360) / 100;
-  if (speed > 1000) {
-    speedOut.html("> 1000km/t");
-    var penaltySpeed = "> 1000km/t";
-  } else {
-    speedOut.html(speed + "km/t");
-    var penaltySpeed = speed + "km/t";
+function afterDecimal(n) {
+  var d = n.toString().split(".")[1];
+  if (d) {
+    return d.length;
   }
+}
 
-  if (timer.hasRun == 0) {
-    speedOut.html("--km/t");
-    timer.hasRun = 1;
-  }
-
-  var penaltyKr = penaltyCheck();
-  console.log(penaltyKr);
-  if (penaltyKr == 0) {
-    printPenalty = 0;
-  } else if (penaltyKr > 0) {
-    penaltyKr += "kr";
-    printPenalty = 1;
-  } else {
-    printPenalty = 1;
-  }
-  var date = day() + "." + month() + "." + year();
-  var timenow = hour() + "." + minute();
-  if (carId.value() == 0) {
-    regnr = "Mangler registreringsnummer";
-  } else {
-    regnr = carId.value();
-  }
-  if (printPenalty) {
-    penalty.html(date + " | " + timenow + " | " + regnr + " | " + penaltySpeed + " | " + penaltyKr);
-  } else {
-    penalty.html('Ingen bot.')
-  }
-
-  var result = database.lookup(regnr);
-  if (result == 0) {
-    lookupResult.html('Ingen treff.');
-  } else {
-    lookupResult.html(result.id + " | " + result.type + " | Toppfart: " + result.maxSpeed + "km/t");
-  }
-
-  if (speed > result.maxSpeed) {
-    vehiclePenalty.html("Bot: " + date + ", " + timenow + ", " + regnr + ", Kjøretøyets toppfart: " + result.maxSpeed + "km/t, " + result.type + ", " + penaltySpeed + ", " + "10000kr");
-  } else {
-    vehiclePenalty.html('');
-  }
-
+function beforeDecimal(n) {
+  return n.toString().split(".")[0].length;
 }
 
 function penaltyCheck() {
