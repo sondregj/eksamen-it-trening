@@ -170,14 +170,24 @@ function UI() {
     } else if (result == 0) {
       lookupResult.html('Ingen treff.');
     } else {
-      lookupResult.html("Kjøretøy: " + result.type + " | Tillatt toppfart: " + result.maxSpeed + "km/t");
+      var mS = result.maxSpeed;
+      if (mS == 0) {
+        mS = "ubegrenset";
+      } else {
+        mS = mS + "km/t";
+      }
+      lookupResult.html("Kjøretøy: " + result.type + " | Tillatt toppfart: " + mS);
     }
-
-    if (speed > result.maxSpeed) {
-      vehiclePenalty.html("Bot: " + date + ", " + timenow + ", " + regnr + ", Kjøretøyets toppfart: " + result.maxSpeed + "km/t, " + result.type + ", " + penaltySpeed + ", " + "10000kr");
-    } else {
-      vehiclePenalty.html('');
+    
+    if (!result.maxSpeed == 0) {
+      if (speed > result.maxSpeed) {
+        vehiclePenalty.html("Bot: " + date + ", " + timenow + ", " + regnr + ", Kjøretøyets toppfart: " + result.maxSpeed + "km/t, " + result.type + ", " + penaltySpeed + ", " + "10000kr");
+      } else {
+        vehiclePenalty.html('');
+      }
     }
+  
+	
     
     var mVOut = vehicleMaxVel.value();
     if (mVOut == 200) {
@@ -244,13 +254,13 @@ function Database() {
     this.addEntry('SR19766', 'Lastebil', 80);
     this.addEntry('UV54545', 'Moped', 45);
     this.addEntry('GF98987', 'Buss', 100);
-    this.addEntry('ST33445', 'Personbil', 999);
+    this.addEntry('ST33445', 'Personbil', 0);
   }
 
   this.addFromForm = function() {
     var a = carId.value();
     if (a !== "") {
-      if (a == 200) {a = 999;}
+      if (a == 200) {a = 0;}
       var b = vehicleType.value();
       var c = vehicleMaxVel.value();
       database.addEntry(a, b, c);
