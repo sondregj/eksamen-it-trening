@@ -1,19 +1,19 @@
-﻿// Sondre Gjellestad | 2017
-
-var speedInit = 1;
-var printPenalty = 0;
+﻿ // Sondre Gjellestad | 2017
 
 function setup() {
-  loadFiles(1);
+  startLoad(2);
 
   // Bruker ikke canvas
   noCanvas();
+
+  //Globale variabler
+  speedInit = 1;
+  printPenalty = 0;
 
   // Initialisere timer og database
   timer = new Timer();
   database = new Database();
   ui = new UI();
-
 
   timer.init();
   database.init(); // initialiserer databasen med eksempler
@@ -22,7 +22,6 @@ function setup() {
   // Sette opp HTML-elementer for brukerinteraksjon
   ui.update();
 }
-
 
 function UI() {
   this.init = function() {
@@ -95,7 +94,6 @@ function UI() {
     addButton.mousePressed(database.addFromForm);
   }
 
-
   this.update = function() {
     // Oppdater uttekstfelt
     distOut.html(distanceInput.value() + " meter");
@@ -111,7 +109,6 @@ function UI() {
       speedString += ".00";
     } else if (decimals == 1) {
       speedString = speedString + "0";
-
     }
 
     var digits = beforeDecimal(speed);
@@ -122,8 +119,6 @@ function UI() {
     } else if (digits == 0) {
       speedString = "000" + speedString;
     }
-
-
 
     if (speed > 1000) {
       speedOut.html("> 1000km/t");
@@ -170,20 +165,18 @@ function UI() {
     } else if (result == 0) {
       lookupResult.html('Ingen treff.');
     } else {
-	    vehicleType.value(result.type);
+      vehicleType.value(result.type);
       var mS = result.maxSpeed;
-	    
       if (mS == 0) {
-	      vehicleMaxVel.value(200);
+        vehicleMaxVel.value(200);
         mS = "ubegrenset";
       } else {
-	      vehicleMaxVel.value(mS);
+        vehicleMaxVel.value(mS);
         mS = mS + "km/t";
       }
       lookupResult.html("Kjøretøy: " + result.type + " | Tillatt toppfart: " + mS);
-	    
     }
-    
+
     if (!result.maxSpeed == 0) {
       if (speed > result.maxSpeed) {
         vehiclePenalty.html("Bot: " + date + ", " + timenow + ", " + regnr + ", Kjøretøyets toppfart: " + result.maxSpeed + "km/t, " + result.type + ", " + penaltySpeed + ", " + "10000kr");
@@ -191,9 +184,7 @@ function UI() {
         vehiclePenalty.html('');
       }
     }
-  
-	
-    
+
     var mVOut = vehicleMaxVel.value();
     if (mVOut == 200) {
       maxVelOut.html("Ubegrenset");
@@ -265,10 +256,12 @@ function Database() {
   this.addFromForm = function() {
     var a = carId.value();
     var x = database.lookup(a);
-	  if (!x && a !== "") {
+    if (!x && a !== "") {
       var b = vehicleType.value();
       var c = vehicleMaxVel.value();
-      if (c == 200) {c = 0;}
+      if (c == 200) {
+        c = 0;
+      }
       database.addEntry(a, b, c);
     }
     ui.update();
@@ -340,6 +333,7 @@ function penaltyCheck() {
   }
   return speedPenalty;
 }
+
 
 function afterDecimal(n) {
   var d = n.toString().split(".")[1];

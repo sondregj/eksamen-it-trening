@@ -1,7 +1,7 @@
 // Sondre Gjellestad | 2017
 
 function setup() {
-  loadFiles(0);
+  startLoad(1);
 
   // Setter opp canvas
   var canvas = createCanvas(600, 200, P2D);
@@ -10,12 +10,6 @@ function setup() {
 
   // Initialisere animasjon
   anim = new Anim();
-
-  // Innstillinger for tegning
-  noStroke();
-  fill(200);
-  textAlign(CENTER, CENTER);
-  textSize(10);
 
   // Setter opp HTML elementer for brukerinteraksjon
   setupHTML();
@@ -65,6 +59,12 @@ function draw() {
     anim.update();
     anim.render();
   } else {
+    // Innstillinger for tegning
+    noStroke();
+    fill(200);
+    textAlign(CENTER, CENTER);
+    textSize(10);
+
     text("Loading", width / 2, height / 2);
   }
 }
